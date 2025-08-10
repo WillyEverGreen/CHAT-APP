@@ -5,6 +5,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import http from "http";
+import mongoose from "mongoose";
 
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
@@ -39,7 +40,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, "http://localhost:5173"],
+    origin: [
+      process.env.FRONTEND_URL,
+      "http://localhost:5173",
+      "https://your-app-name.onrender.com", // Replace with your actual Render URL
+    ],
     credentials: true,
   })
 );
@@ -50,10 +55,18 @@ app.use("/api/messages", messageRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
+  const dbStatus =
+    mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+
   res.status(200).json({
     status: "OK",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    database: dbStatus,
+    environment: process.env.NODE_ENV || "development",
+    mongodb_uri_exists: !!process.env.MONGODB_URI,
+    jwt_secret_exists: !!process.env.JWT_SECRET,
+    frontend_url: process.env.FRONTEND_URL || "Not set",
   });
 });
 
