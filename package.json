@@ -1,10 +1,10 @@
 {
   "name": "chat-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "backend/src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "build": "cd ../frontend && npm install && npm run build && cp -r dist/* ../backend/public/",
+    "start": "node backend/src/index.js",
+    "build": "cd backend/frontend && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
