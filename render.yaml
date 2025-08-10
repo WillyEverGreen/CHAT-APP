@@ -14,7 +14,9 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL
-        value: https://your-app-name.onrender.com
+        value: https://chat-app-backend.onrender.com
+      - key: VITE_API_URL
+        value: https://chat-app-backend.onrender.com
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY

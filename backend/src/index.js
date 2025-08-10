@@ -38,12 +38,49 @@ console.log(
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+
+// Log CORS configuration
+console.log("CORS Configuration:");
+console.log("  FRONTEND_URL:", process.env.FRONTEND_URL);
+console.log("  Allowed origins:", [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "https://localhost:5173",
+]);
+
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, "http://localhost:5173"],
+    origin: function (origin, callback) {
+      console.log("Request origin:", origin);
+
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        "http://localhost:5173",
+        "https://localhost:5173",
+      ];
+
+      if (allowedOrigins.includes(origin)) {
+        console.log("Origin allowed:", origin);
+        return callback(null, true);
+      }
+
+      console.log("Origin blocked:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log("  Headers:", req.headers);
+  console.log("  Body:", req.body);
+  next();
+});
 
 // API Routes
 app.use("/api/auth", authRoutes);
@@ -75,8 +112,11 @@ app.get("/*", (req, res) => {
 });
 
 // Start server
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`Server accessible at:`);
+  console.log(`  - Local: http://localhost:${PORT}`);
+  console.log(`  - Network: http://0.0.0.0:${PORT}`);
   console.log(`Frontend URL: ${process.env.FRONTEND_URL || "Not set"}`);
 
   // Connect to database without blocking server startup

@@ -4,7 +4,7 @@
   "main": "backend/src/index.js",
   "scripts": {
     "start": "node backend/src/index.js",
-    "build": "npm install && cd backend && npm install && cd frontend && npm install && npm run build",
+    "build": "npm install && cd backend && npm install && cd frontend && npm install && VITE_API_URL=https://chat-app-backend.onrender.com npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
