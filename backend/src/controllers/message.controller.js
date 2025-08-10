@@ -43,6 +43,26 @@ export const sendMessage = async (req, res) => {
     const { userId: receiverId } = req.params; // Get the user ID from the request parameters
     const senderId = req.user._id;
 
+    console.log("sendMessage called with:", {
+      text,
+      image,
+      receiverId,
+      senderId,
+    });
+
+    // Validate that we have either text or image
+    if (!text && !image) {
+      return res
+        .status(400)
+        .json({ error: "Message must contain text or image" });
+    }
+
+    // Check if receiver exists
+    const receiver = await User.findById(receiverId);
+    if (!receiver) {
+      return res.status(404).json({ error: "Receiver not found" });
+    }
+
     let imageUrl;
 
     if (image) {
@@ -54,16 +74,24 @@ export const sendMessage = async (req, res) => {
     const newMessage = new Message({
       senderId,
       receiverId,
-      text,
+      text: text || "",
       image: imageUrl,
     });
 
+    console.log("Saving message:", newMessage);
     await newMessage.save();
 
-    //todo: realtime functionality goes here => socket.io
+    // Real-time functionality with socket.io
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("receiveMessage", newMessage);
+      // Emit to the receiver
+      io.to(receiverSocketId).emit("newMessage", { newMessage });
+
+      // Also emit to the sender for immediate UI update
+      const senderSocketId = getReceiverSocketId(senderId);
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("newMessage", { newMessage });
+      }
     }
 
     res.status(201).json(newMessage);

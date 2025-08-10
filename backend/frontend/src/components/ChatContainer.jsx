@@ -23,15 +23,20 @@ const ChatContainer = () => {
     if (!selectedUser?._id) return;
 
     getMessages(selectedUser._id);
-    subscribeToMessages?.(selectedUser._id);
+    subscribeToMessages?.();
 
     return () => {
       // Call only if it's a function
       if (typeof unsubscribeFromMessages === "function") {
-        unsubscribeFromMessages(selectedUser._id);
+        unsubscribeFromMessages();
       }
     };
-  }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+  }, [
+    selectedUser?._id,
+    getMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   useEffect(() => {
     if (messageEndRef.current && messages?.length) {
