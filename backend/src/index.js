@@ -46,6 +46,8 @@ console.log("  Allowed origins:", [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
   "https://localhost:5173",
+  "https://chat-app-8snn.onrender.com",
+  "https://chat-app-backend.onrender.com",
 ]);
 
 app.use(
@@ -60,9 +62,24 @@ app.use(
         process.env.FRONTEND_URL,
         "http://localhost:5173",
         "https://localhost:5173",
+        // Allow requests from the same domain (for Render deployment)
+        "https://chat-app-8snn.onrender.com",
+        "https://chat-app-backend.onrender.com",
+        // Allow requests from any Render subdomain
+        /^https:\/\/.*\.onrender\.com$/,
       ];
 
-      if (allowedOrigins.includes(origin)) {
+      // Check if origin is in allowed origins (including regex patterns)
+      const isAllowed = allowedOrigins.some((allowedOrigin) => {
+        if (typeof allowedOrigin === "string") {
+          return allowedOrigin === origin;
+        } else if (allowedOrigin instanceof RegExp) {
+          return allowedOrigin.test(origin);
+        }
+        return false;
+      });
+
+      if (isAllowed) {
         console.log("Origin allowed:", origin);
         return callback(null, true);
       }
