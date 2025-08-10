@@ -4,8 +4,13 @@
   "main": "backend/src/index.js",
   "scripts": {
     "start": "node backend/src/index.js",
-    "build": "npm install && cd backend && npm install && cd frontend && npm install && VITE_API_URL=https://chat-app-backend.onrender.com npm run build",
+    "build": "npm install && cd backend && npm install && cd frontend && npm install && VITE_API_URL=https://chat-app-8snn.onrender.com npm run build",
+    "build:local": "npm install && cd backend && npm install && cd frontend && npm install && VITE_API_URL=http://localhost:5000 npm run build",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
   },
   "keywords": [],
   "author": "",
